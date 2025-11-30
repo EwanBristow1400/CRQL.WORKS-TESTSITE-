@@ -13,7 +13,7 @@ const palette = ["#ff8533", "#3399ff", "#bb33ff", "#33ff33", "#ff3333"];
 
 function preload(){
     font = loadFont('../img/CompoundMono.ttf');
-
+    UZUImage = loadImage("../img/SexyUZUImage.png");
 }
 function setup() {
 
@@ -27,7 +27,6 @@ function setup() {
     rectMode(CORNER);
     textAlign(CENTER, CENTER);
     background(0);
-
 
     for (let i = 0; i < 60; i++) {
         squares.push(new _square());
@@ -57,7 +56,44 @@ function draw() {
     fill(255)
 
 
-    rect((constrain((PagePos-width), -width, 0)) * 1.1, 0, width*1.1, height);
+    rect(0,PagePos*-1 + windowHeight,windowWidth, windowHeight*20)
+    if(PagePos > windowHeight){
+        ScrollUp = PagePos-windowHeight
+
+    }
+    else(
+        ScrollUp = 0
+    )
+
+    PagePos = constrain(PagePos, 0, 2000)
+    ScrollUp = constrain(ScrollUp,0,2000)
+
+    let cardheight = windowHeight*0.7
+    let cardwidth = windowWidth*0.25
+
+    push()
+    fill(255,0,0)
+    rectMode(TOP)
+    rect((windowWidth/2) - (cardwidth/2), windowHeight - ScrollUp, cardwidth, cardheight)
+    pop()
+
+    image(UZUImage,(windowWidth/2) - (cardwidth/2), windowHeight - ScrollUp, cardwidth, cardheight)
+
+    push()
+    fill(255,0,0)
+    rectMode(TOP)
+    rect((windowWidth/5) - (cardwidth/2), windowHeight - ScrollUp, cardwidth, cardheight)
+    pop()
+
+    push()
+    fill(255,0,0)
+    rectMode(TOP)
+    rect((windowWidth/1.25) - (cardwidth/2), windowHeight - ScrollUp, cardwidth, cardheight)
+    pop()
+
+
+
+
 
     blendMode(DIFFERENCE)
 
@@ -69,6 +105,8 @@ function draw() {
     blendMode(BLEND)
 
 
+
+
     image(gridGfx, 0, 0, width, height);
     fill(255,0,0)
     textSize(40)
@@ -77,29 +115,9 @@ function draw() {
     text(windowWidth, 60, 80)
 
 
-    if (PagePos > windowWidth){
-        ScrollUp = (PagePos - windowWidth)
-    }
-    else {
-        ScrollUp = 0
-    }
-    ScrollUp = round(ScrollUp,1)
-
-    text(ScrollUp, 60, 120)
-
-    rectMode(CENTER)
-
-
-
-    UZUscroll = constrain(ScrollUp, 0, windowHeight)
-    UZUscroll = map(UZUscroll, 0, windowHeight, windowHeight, 0)
-    rect(200,UZUscroll, 200, 200)
-
-
-    rectMode(CORNER
-    )
 
 }
+
 
 function mouseDragged() {
     // snap to grid
@@ -111,8 +129,6 @@ function mouseDragged() {
 
 function mouseWheel(event) {
   PagePosTarget += event.delta;
-
-
 }
 
 function windowResized() {
@@ -187,3 +203,8 @@ class _square {
 function snapToGrid(v) {
     return Math.round(v / squaresize) * squaresize;
 }
+
+
+//function scrollupgrid(){
+//    for ()
+//}

@@ -6,6 +6,11 @@
   <title>CRQL</title>
   <script src="js/p5.min.js"></script>
   <style>
+    @font-face {
+      font-family: "HurleyFont"; /* set name */
+      src: url("img/CompoundMono.ttf"); /* url of the font */
+    }
+
     html, body {
       margin: 0;
       padding: 0;
@@ -19,12 +24,26 @@
       width: 100vw;
       height: 100vh;
     }
+    button {
+
+      border-color: black;
+      border-style: solid;
+      border-width: 1;
+      border-radius: 10px;
+      padding: 0px;
+      color: white;
+      background: #222222;
+      transition: color 0.3s ease; /* Add this line */
+
+    }
+
+    button:hover {
+      color: #ff8533;
+    }
   </style>
 </head>
 
 <body>
-<section id="p5-container">
-  <script src="js/TheFunStuff.js"></script>
-</section>
+<script src="js/UZUPage.js"></script>
 </body>
 </html>
