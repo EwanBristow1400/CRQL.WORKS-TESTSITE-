@@ -57,7 +57,8 @@ function draw(){
 
 
 
-    PagePos = lerp(PagePos, PagePosDest, 0.1);
+
+    PagePos = lerp(PagePos, PagePosDest, 0.2);
     PagePos = constrain(PagePos,0,(windowHeight*4))
     PagePos = round(PagePos / 1) * 1
 
@@ -157,14 +158,6 @@ function draw(){
 
         roundedImage(UZUVideo, x, y, newW, newH, 20);
     }
-    push()
-
-    noStroke()
-    fill(255)
-    noCursor()
-    blendMode(DIFFERENCE)
-    circle(mouseX, mouseY, 30)
-    pop()
 }
 
 function roundedImage(img, x, y, w, h, r) {
