@@ -2,60 +2,81 @@ let UZUVideo;
 let ParticlesVideo;
 let PagePosDest = 0;  // initialise so it's not undefined
 let PagePos = 0;
-
 let DemoVideoOne;
+let logoHitbox = null;
+let canvasEl;
+let currentCursor = "default";
+
+let ButtonTextSize;
+
+let VolumeToggle;
 
 function preload(){
-    CFont = loadFont('../img/CompoundMono.ttf');
-    HFont = loadFont("../img/HurleybirdJr_ATSFS.ttf");
+    // Paths relative to site root so they work from subdirectories.
+    CFont = loadFont('img/CompoundMono.ttf');
+    HFont = loadFont("img/HurleybirdJr_ATSFS.ttf");
+    CRQLIMAGE = loadImage("img/CRQL_Logo.svg")
 }
 
 function setup() {
-    createCanvas(windowWidth, windowHeight);
-    pixelDensity(1); // lower pixel density to reduce GPU/CPU overhead on high-DPI screens
+    pixelDensity(1)
+    background(255,133,51);
+    // Render at device pixel ratio so text doesn't look blurry/pixelated on HiDPI screens.
+    pixelDensity(window.devicePixelRatio)
+
+    canvasEl = createCanvas(windowWidth, (windowHeight*3));
     textFont(HFont);
+    setCursor("default");
+
+
 
     UZUVideo = createVideo("../img/uzu-website-video-two-compressed.mp4", () => {
-        UZUVideo.volume(0);
-        UZUVideo.loop();
-        UZUVideo.hide();
-        sizeMediaToTarget(UZUVideo, windowWidth * 0.8, windowHeight * 0.8);
+        UZUVideo.volume(0);   // mute
+        UZUVideo.loop();      // autoplay + loop
+        UZUVideo.showControls()
+        UZUVideo.hide()
+        UZUVideo.size(AUTO,windowHeight*0.6)
     });
-
 
     ParticlesVideo = createVideo("../img/UZU-Particles.webm", () => {
         ParticlesVideo.volume(0);
-        ParticlesVideo.loop();
-        ParticlesVideo.hide();
-        sizeMediaToTarget(ParticlesVideo, windowWidth * 0.6, windowHeight * 0.6);
+        ParticlesVideo.loop();  // autoplay + loop
+        ParticlesVideo.hide();  // we’ll draw it manually
+        ParticlesVideo.size(AUTO,windowHeight*0.6)
     });
 
     DemoVideoOne = createVideo("../img/dry-wet-uzuvideo(compressed).mp4", () => {
-        DemoVideoOne.volume(0);
-
-        DemoVideoOne.showControls();
-
+        DemoVideoOne.volume(0);          // or 0.5 if you want it quieter
+        DemoVideoOne.loop();             // loops video + audio
+                // still draw into canvas
+        DemoVideoOne.size(AUTO,windowHeight * 0.6); // just pick a height; width auto is fine
+        DemoVideoOne.autoplay()
+        DemoVideoOne.showControls()
+        DemoVideoOne.position (windowWidth/2, windowHeight/4 + windowHeight*2)
     });
+
+
+
+
+
 
     MainButton = createButton("Buy for £13");
     MainButton.mouseClicked(CallPurchase);
     MainButton.style("font-family", "HurleyFont");
+    MainButton.position(windowWidth*0.05,windowHeight/2)
+    MainButton.size(windowWidth*0.2, windowHeight*0.1)
+    ButtonTextSize = windowWidth *0.02
+    MainButton.style('font-size',   ButtonTextSize + 'px');
+
 }
 
-const lastButtonLayout = {
-    x: null,
-    y: null,
-    w: null,
-    h: null,
-    fontSize: null,
-};
+
+
 
 function draw(){
-    background(255,133,51);
+    clear()
+    imageMode(CENTER)
     textAlign(LEFT,CENTER);
-
-
-
 
 
     PagePos = lerp(PagePos, PagePosDest, 0.2);
@@ -64,27 +85,24 @@ function draw(){
 
     let offsetY = -PagePos;
 
-    updateButtonLayout(offsetY);
-
-    // debug readout
-    push();
     textSize(20);
     text(PagePos, 20, 50);
-    pop();
 
     // UZU
     push();
     fill(10);
     textSize(windowWidth/10);
-    text("UZU", windowWidth*0.05, windowHeight/2.5 + offsetY);
+    text("UZU", windowWidth*0.05, windowHeight/2.5);
     pop();
+
+    image(UZUVideo, windowWidth/1.5,windowHeight/2)
 
     // The Freq Domain Phaser
     push();
     textFont(CFont);
     fill(10);
     textSize(windowWidth/50);
-    text("The Frequency-Domain Phaser", windowWidth*0.05, windowHeight/2.2 + offsetY);
+    text("The Frequency-Domain Phaser", windowWidth*0.05, windowHeight/2.2);
     pop();
 
     // For Razer-sharp spectral Filtering
@@ -93,35 +111,33 @@ function draw(){
     fill(0);
     textLeading(windowWidth/13)
     textSize(windowWidth/10);
-    text("8192\nNotches", windowWidth*0.05, (windowHeight * 2 + offsetY - windowHeight/2));
+    text("8192\nNotches", windowWidth*0.05, (windowHeight * 2) - windowHeight/2);
     pop();
 
-
-    image(ParticlesVideo,windowWidth/2, (windowHeight * 1.75 + offsetY - windowHeight/2))
+    image(ParticlesVideo, windowWidth,windowHeight/2 + windowHeight)
 
     push();
     textFont(CFont);
     fill(0);
     textSize(windowWidth/50);
-    text("Powered by spectral filtering.\nSimple idea, strange results",windowWidth*0.05, (windowHeight * 2.2 + offsetY - windowHeight/2));
+    text("Powered by spectral filtering.\nSimple idea, strange results",windowWidth*0.05, (windowHeight * 2.2) - windowHeight/2);
     pop();
 
 
-    // 8192 Notches
+    // --- "What does it sound like?" section ---
     push();
     textFont(CFont);
     fill(0);
-
-    textLeading(windowWidth/13)
-    textSize(windowWidth/10);
-    text("What\nDoes it\nSound\nLike?", windowWidth*0.05,(windowHeight * 3 + offsetY - windowHeight/2));
+    textLeading(windowWidth / 13);
+    textSize(windowWidth / 10);
+    text("What\nDoes it\nSound\nLike?",
+        windowWidth * 0.05,
+        (windowHeight * 3 + offsetY - windowHeight / 2));
     pop();
 
-    let DemoVideoOneHeight = DemoVideoOne.height;
-    DemoVideoOne.position(
-        windowWidth/2,
-        (windowHeight * 3 + offsetY - windowHeight/2) - DemoVideoOne.height / 2
-    );
+
+
+
 
 
     // 8192 Notches
@@ -140,94 +156,76 @@ function draw(){
     text("Versions for Windows, Mac and Linux",windowWidth*0.05, (windowHeight * 4.25 + offsetY - windowHeight/2));
     pop();
 
-    // VIDEO
-    let vw = UZUVideo.width;
-    let vh = UZUVideo.height;
+    push()
+    noStroke()
+    fill(28)
+    rect(0,0,windowWidth,windowHeight*0.08)
 
-    if (vw > 0 && vh > 0) {
-        let maxW = windowWidth  * 0.8;
-        let maxH = windowHeight * 0.8;
-        let scaleW = maxW / vw;
-        let scaleH = maxH / vh;
-        let scale = min(scaleW, scaleH);
-        let newW = vw * scale;
-        let newH = vh * scale;
+    const logoSize = windowHeight*0.08;
+    const logoX = windowHeight*0.04;
+    const logoY = windowHeight*0.04;
+    image(CRQLIMAGE,logoX,logoY,logoSize,logoSize)
+    logoHitbox = {
+        x: logoX - logoSize/2,
+        y: logoY - logoSize/2,
+        w: logoSize,
+        h: logoSize
+    };
 
-        let x = windowWidth - newW * 1.4;
-        let y = windowHeight/2 - newH/2 + offsetY;
+    pop()
 
-        roundedImage(UZUVideo, x, y, newW, newH, 20);
+    const hoveringLogo =
+        logoHitbox &&
+        mouseX >= logoHitbox.x &&
+        mouseX <= logoHitbox.x + logoHitbox.w &&
+        mouseY >= logoHitbox.y &&
+        mouseY <= logoHitbox.y + logoHitbox.h;
+    setCursor(hoveringLogo ? "pointer" : "default");
+}
+
+function mousePressed() {
+    if (!logoHitbox) return;
+    const hitX = mouseX >= logoHitbox.x && mouseX <= logoHitbox.x + logoHitbox.w;
+    const hitY = mouseY >= logoHitbox.y && mouseY <= logoHitbox.y + logoHitbox.h;
+    if (hitX && hitY) {
+        window.location.href = "index.html";
     }
 }
 
-function roundedImage(img, x, y, w, h, r) {
-    const ctx = drawingContext;
-
-    ctx.save();
-    ctx.beginPath();
-    ctx.moveTo(x + r, y);
-    ctx.lineTo(x + w - r, y);
-    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-    ctx.lineTo(x + w, y + h - r);
-    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-    ctx.lineTo(x + r, y + h);
-    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-    ctx.lineTo(x, y + r);
-    ctx.quadraticCurveTo(x, y, x + r, y);
-    ctx.closePath();
-    ctx.clip();
-
-    image(img, x, y, w, h);
-
-    ctx.restore();
-}
-
-function mouseWheel(event) {
-    PagePosDest += event.delta;
-    PagePosDest = constrain(PagePosDest,0,windowHeight* 3)
-    return false;
-}
 
 function windowResized() {
-    resizeCanvas(windowWidth, windowHeight);
-}
+    resizeCanvas(windowWidth, windowHeight*3);
+    MainButton.position(windowWidth*0.05,windowHeight/2)
+    MainButton.size(windowWidth*0.2, windowHeight*0.1)
+    ButtonTextSize = windowWidth *0.02
+    MainButton.style('font-size',   ButtonTextSize + 'px');
 
+    DemoVideoOne.position (windowWidth/2, windowHeight/4 + windowHeight*2)
+
+    DemoVideoOne.size(AUTO, windowHeight*0.6)
+    ParticlesVideo.size(AUTO,windowHeight*0.6)
+}
 function CallPurchase(){
     console.log("PURCHASE CALLED");
+    checkout('uzu', 'uzu13', false)
 }
 
-function updateButtonLayout(offsetY) {
-    const x = windowWidth * 0.05;
-    const y = windowHeight / 2 + offsetY;
-    const w = windowWidth * 0.2;
-    const h = windowHeight * 0.1;
-    const fontSize = windowWidth * 0.02;
+async function checkout(product, tier, isTest) {
+    const currentPage = window.location.href
 
-    // Only touch DOM when values change to avoid unnecessary layout work each frame
-    if (lastButtonLayout.x !== x || lastButtonLayout.y !== y) {
-        MainButton.position(x, y);
-        lastButtonLayout.x = x;
-        lastButtonLayout.y = y;
-    }
+    const res = await fetch(isTest ? "https://api.crql.works/checkout-test" : "https://api.crql.works/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ product, tier, return_url: currentPage })
+    })
 
-    if (lastButtonLayout.w !== w || lastButtonLayout.h !== h) {
-        MainButton.size(w, h);
-        lastButtonLayout.w = w;
-        lastButtonLayout.h = h;
-    }
-
-    if (lastButtonLayout.fontSize !== fontSize) {
-        MainButton.style("font-size", fontSize + "px");
-        lastButtonLayout.fontSize = fontSize;
-    }
+    const data = await res.json()
+    window.location.href = data.url
 }
 
-function sizeMediaToTarget(media, targetW, targetH) {
-    // Resize DOM video to avoid decoding/drawing at full resolution
-    const mw = media.width || targetW;
-    const mh = media.height || targetH;
-    const scale = min(targetW / mw, targetH / mh);
-    const newW = mw * scale;
-    const newH = mh * scale;
-    media.size(newW, newH);
+function setCursor(cursorStyle) {
+    if (!canvasEl || cursorStyle === currentCursor) return;
+    currentCursor = cursorStyle;
+    canvasEl.elt.style.cursor = cursorStyle;
+    document.body.style.cursor = cursorStyle;
 }

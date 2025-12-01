@@ -38,7 +38,7 @@
     // Main Shader class
     class Shader {
         constructor(options = {}) {
-            this.width = options.width || 11;
+            this.width = options.width || 100;
             this.height = options.height || 100;
             this.fragment = options.fragment || ((uv) => texture(uv.x, uv.y));
             this.canvasDPI = 1;
@@ -67,7 +67,7 @@
         border-radius: 100px;
         box-shadow: 0 10px 10px rgba(0, 0, 0, 0.25), 0 -10px 25px inset rgba(0, 0, 0, 0.15);
         cursor: grab;
-        backdrop-filter: url(#${this.id}_filter) blur(0px) contrast(1) brightness(1.1) saturate(1);
+        backdrop-filter: url(#${this.id}_filter) blur(0.5px) contrast(1) brightness(1) saturate(1);
         z-index: 9999;
         pointer-events: none;
       `;
@@ -141,10 +141,6 @@
             let isDragging = false;
             let startX, startY, initialX, initialY;
 
-
-
-
-
             // Handle window resize to maintain constraints
             window.addEventListener('resize', () => {
                 const rect = this.container.getBoundingClientRect();
@@ -196,13 +192,13 @@
                 const g = rawValues[index++] / maxScale + 0.5;
                 data[i] = r * 255;
                 data[i + 1] = g * 255;
-                data[i + 2] = 0;
+                data[i + 2] = 1;
                 data[i + 3] = 255;
             }
 
             this.context.putImageData(new ImageData(data, w, h), 0, 0);
             this.feImage.setAttributeNS('http://www.w3.org/1999/xlink', 'href', this.canvas.toDataURL());
-            this.feDisplacementMap.setAttribute('scale', (maxScale * 3 / this.canvasDPI).toString());
+            this.feDisplacementMap.setAttribute('scale', (maxScale * 5 / this.canvasDPI).toString());
         }
 
         appendTo(parent) {

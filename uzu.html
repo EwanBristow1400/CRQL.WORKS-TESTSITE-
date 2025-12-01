@@ -5,9 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, height=device-height" />
   <title>CRQL</title>
 
-  <!-- Preload/prefetch heavy assets so UZU/LOCD pages open instantly -->
-
-
   <script src="js/p5.min.js"></script>
 
   <style>
@@ -21,16 +18,15 @@
       padding: 0;
       width: 100%;
       height: 100%;
-      overflow: hidden;
-      overscroll-behavior: none;
-      touch-action: none;
 
+
+      touch-action: none;
       background: #ff8533;
     }
 
     canvas {
       display: block;
-      background: #000;
+      background: #ff8533;
       /* Let p5 set the true pixel size so text isn't scaled and blurred. */
     }
 
@@ -47,22 +43,13 @@
       color: #ff8533;
     }
 
-    /* Firefox-friendly fallback: simple frosted blur */
-    .liquid-glass {
-      backdrop-filter: blur(16px);
-    }
 
-    /* Chrome-only override: fancy displacement filter when supported */
-    @supports (backdrop-filter: url("#dummy")) {
-      .liquid-glass {
-        backdrop-filter: url(#mySvgFilter) blur(0px) brightness(1.1) contrast(1) saturate(1);
-      }
-    }
   </style>
 </head>
 
 <body>
-<script src="js/TheFunStuff.js"></script>
+<script src="js/Liquid-Glass.js"></script>
+<script src="js/UZUPage.js"></script>
 
 </body>
 </html>
